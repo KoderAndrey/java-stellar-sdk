@@ -1,21 +1,22 @@
 package org.stellar.sdk.requests;
 
-import org.apache.http.client.utils.URIBuilder;
-
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.io.IOException;
 import java.util.ArrayList;
+import okhttp3.HttpUrl;
+import okhttp3.Request;
+import okhttp3.Response;
+import org.stellar.sdk.Server;
 
 /**
  * Abstract class for request builders.
  */
 public abstract class RequestBuilder {
-  protected URIBuilder uriBuilder;
+  protected HttpUrl.Builder urlBuilder;
   private ArrayList<String> segments;
   private boolean segmentsAdded;
 
-  RequestBuilder(URI serverURI, String defaultSegment) {
-    uriBuilder = new URIBuilder(serverURI);
+  RequestBuilder(HttpUrl serverUrl, String defaultSegment) {
+    urlBuilder = serverUrl.newBuilder();
     segments = new ArrayList<String>();
     if (defaultSegment != null) {
       this.setSegments(defaultSegment);
@@ -46,7 +47,7 @@ public abstract class RequestBuilder {
    * @param cursor
    */
   public RequestBuilder cursor(String cursor) {
-    uriBuilder.addParameter("cursor", cursor);
+    urlBuilder.addQueryParameter("cursor", cursor);
     return this;
   }
 
@@ -57,7 +58,7 @@ public abstract class RequestBuilder {
    * @param number maxium number of records to return
    */
   public RequestBuilder limit(int number) {
-    uriBuilder.addParameter("limit", String.valueOf(number));
+    urlBuilder.addQueryParameter("limit", String.valueOf(number));
     return this;
   }
 
@@ -66,23 +67,15 @@ public abstract class RequestBuilder {
    * @param direction {@link org.stellar.sdk.requests.RequestBuilder.Order}
    */
   public RequestBuilder order(Order direction) {
-    uriBuilder.addParameter("order", direction.getValue());
+    urlBuilder.addQueryParameter("order", direction.getValue());
     return this;
   }
 
-  URI buildUri() {
-    if (segments.size() > 0) {
-      String path = "";
-      for (String segment : segments) {
-        path += "/"+segment;
-      }
-      uriBuilder.setPath(path);
+  HttpUrl buildUrl() {
+    for (String segment : segments) {
+      urlBuilder.addPathSegment(segment);
     }
-    try {
-      return uriBuilder.build();
-    } catch (URISyntaxException e) {
-      throw new RuntimeException(e);
-    }
+    return urlBuilder.build();
   }
 
   /**

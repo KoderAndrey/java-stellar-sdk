@@ -2,17 +2,17 @@ package org.stellar.sdk.requests;
 
 import com.google.gson.reflect.TypeToken;
 
-import org.apache.http.client.fluent.Request;
+import okhttp3.HttpUrl;
 import org.glassfish.jersey.media.sse.EventSource;
 import org.glassfish.jersey.media.sse.InboundEvent;
 import org.glassfish.jersey.media.sse.SseFeature;
+import org.stellar.sdk.HttpClient;
 import org.stellar.sdk.KeyPair;
 import org.stellar.sdk.responses.GsonSingleton;
 import org.stellar.sdk.responses.Page;
 import org.stellar.sdk.responses.operations.OperationResponse;
 
 import java.io.IOException;
-import java.net.URI;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -24,8 +24,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Builds requests connected to payments.
  */
 public class PaymentsRequestBuilder extends RequestBuilder {
-  public PaymentsRequestBuilder(URI serverURI) {
-    super(serverURI, "payments");
+  public PaymentsRequestBuilder(HttpUrl serverUrl) {
+    super(serverUrl, "payments");
   }
 
   /**
@@ -67,10 +67,10 @@ public class PaymentsRequestBuilder extends RequestBuilder {
    * @throws TooManyRequestsException when too many requests were sent to the Horizon server.
    * @throws IOException
    */
-  public static Page<OperationResponse> execute(URI uri) throws IOException, TooManyRequestsException {
+  public static Page<OperationResponse> execute(HttpUrl url) throws IOException, TooManyRequestsException {
     TypeToken type = new TypeToken<Page<OperationResponse>>() {};
     ResponseHandler<Page<OperationResponse>> responseHandler = new ResponseHandler<Page<OperationResponse>>(type);
-    return (Page<OperationResponse>) Request.Get(uri).execute().handleResponse(responseHandler);
+    return HttpClient.executeGetAndHandleResponse(url, responseHandler);
   }
 
   /**
@@ -85,7 +85,7 @@ public class PaymentsRequestBuilder extends RequestBuilder {
    */
   public EventSource stream(final EventListener<OperationResponse> listener) {
     Client client = ClientBuilder.newBuilder().register(SseFeature.class).build();
-    WebTarget target = client.target(this.buildUri());
+    WebTarget target = client.target(this.buildUrl().uri());
     EventSource eventSource = new EventSource(target) {
       @Override
       public void onEvent(InboundEvent inboundEvent) {
@@ -107,7 +107,7 @@ public class PaymentsRequestBuilder extends RequestBuilder {
    * @throws IOException
    */
   public Page<OperationResponse> execute() throws IOException, TooManyRequestsException {
-    return this.execute(this.buildUri());
+    return this.execute(this.buildUrl());
   }
 
   @Override

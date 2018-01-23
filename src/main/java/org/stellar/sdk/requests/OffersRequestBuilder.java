@@ -2,13 +2,13 @@ package org.stellar.sdk.requests;
 
 import com.google.gson.reflect.TypeToken;
 
-import org.apache.http.client.fluent.Request;
+import okhttp3.HttpUrl;
+import org.stellar.sdk.HttpClient;
 import org.stellar.sdk.KeyPair;
 import org.stellar.sdk.responses.OfferResponse;
 import org.stellar.sdk.responses.Page;
 
 import java.io.IOException;
-import java.net.URI;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -16,8 +16,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Builds requests connected to offers.
  */
 public class OffersRequestBuilder extends RequestBuilder {
-  public OffersRequestBuilder(URI serverURI) {
-    super(serverURI, "offers");
+  public OffersRequestBuilder(HttpUrl serverUrl) {
+    super(serverUrl, "offers");
   }
 
   /**
@@ -38,10 +38,10 @@ public class OffersRequestBuilder extends RequestBuilder {
    * @throws TooManyRequestsException when too many requests were sent to the Horizon server.
    * @throws IOException
    */
-  public static Page<OfferResponse> execute(URI uri) throws IOException, TooManyRequestsException {
+  public static Page<OfferResponse> execute(HttpUrl url) throws IOException, TooManyRequestsException {
     TypeToken type = new TypeToken<Page<OfferResponse>>() {};
     ResponseHandler<Page<OfferResponse>> responseHandler = new ResponseHandler<Page<OfferResponse>>(type);
-    return (Page<OfferResponse>) Request.Get(uri).execute().handleResponse(responseHandler);
+    return HttpClient.executeGetAndHandleResponse(url, responseHandler);
   }
 
   /**
@@ -51,7 +51,7 @@ public class OffersRequestBuilder extends RequestBuilder {
    * @throws IOException
    */
   public Page<OfferResponse> execute() throws IOException, TooManyRequestsException {
-    return this.execute(this.buildUri());
+    return this.execute(this.buildUrl());
   }
 
   @Override

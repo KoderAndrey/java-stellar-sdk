@@ -2,17 +2,17 @@ package org.stellar.sdk.requests;
 
 import com.google.gson.reflect.TypeToken;
 
-import org.apache.http.client.fluent.Request;
+import okhttp3.HttpUrl;
 import org.glassfish.jersey.media.sse.EventSource;
 import org.glassfish.jersey.media.sse.InboundEvent;
 import org.glassfish.jersey.media.sse.SseFeature;
+import org.stellar.sdk.HttpClient;
 import org.stellar.sdk.KeyPair;
 import org.stellar.sdk.responses.GsonSingleton;
 import org.stellar.sdk.responses.Page;
 import org.stellar.sdk.responses.effects.EffectResponse;
 
 import java.io.IOException;
-import java.net.URI;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -24,8 +24,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Builds requests connected to effects.
  */
 public class EffectsRequestBuilder extends RequestBuilder {
-  public EffectsRequestBuilder(URI serverURI) {
-    super(serverURI, "effects");
+  public EffectsRequestBuilder(HttpUrl serverUrl) {
+    super(serverUrl, "effects");
   }
 
   /**
@@ -77,10 +77,10 @@ public class EffectsRequestBuilder extends RequestBuilder {
    * @throws TooManyRequestsException when too many requests were sent to the Horizon server.
    * @throws IOException
    */
-  public static Page<EffectResponse> execute(URI uri) throws IOException, TooManyRequestsException {
+  public static Page<EffectResponse> execute(HttpUrl url) throws IOException, TooManyRequestsException {
     TypeToken type = new TypeToken<Page<EffectResponse>>() {};
     ResponseHandler<Page<EffectResponse>> responseHandler = new ResponseHandler<Page<EffectResponse>>(type);
-    return (Page<EffectResponse>) Request.Get(uri).execute().handleResponse(responseHandler);
+    return HttpClient.executeGetAndHandleResponse(url, responseHandler);
   }
 
   /**
@@ -95,7 +95,7 @@ public class EffectsRequestBuilder extends RequestBuilder {
    */
   public EventSource stream(final EventListener<EffectResponse> listener) {
     Client client = ClientBuilder.newBuilder().register(SseFeature.class).build();
-    WebTarget target = client.target(this.buildUri());
+    WebTarget target = client.target(this.buildUrl().uri());
     EventSource eventSource = new EventSource(target) {
       @Override
       public void onEvent(InboundEvent inboundEvent) {
@@ -117,7 +117,7 @@ public class EffectsRequestBuilder extends RequestBuilder {
    * @throws IOException
    */
   public Page<EffectResponse> execute() throws IOException, TooManyRequestsException {
-    return this.execute(this.buildUri());
+    return this.execute(this.buildUrl());
   }
 
   @Override
