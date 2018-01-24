@@ -6,7 +6,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import org.stellar.sdk.HttpClient;
+import org.stellar.sdk.http.HttpClient;
 import org.stellar.sdk.requests.*;
 import org.stellar.sdk.responses.GsonSingleton;
 import org.stellar.sdk.responses.SubmitTransactionResponse;

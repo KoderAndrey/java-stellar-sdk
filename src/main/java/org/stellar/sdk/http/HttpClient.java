@@ -1,6 +1,7 @@
-package org.stellar.sdk;
+package org.stellar.sdk.http;
 
 import okhttp3.*;
+import org.stellar.sdk.ResponseHandler;
 import org.stellar.sdk.requests.ResponseHandlerClass;
 
 import java.io.IOException;

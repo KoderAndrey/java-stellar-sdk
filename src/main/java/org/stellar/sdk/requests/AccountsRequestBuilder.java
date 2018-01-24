@@ -6,7 +6,7 @@ import okhttp3.HttpUrl;
 import org.glassfish.jersey.media.sse.EventSource;
 import org.glassfish.jersey.media.sse.InboundEvent;
 import org.glassfish.jersey.media.sse.SseFeature;
-import org.stellar.sdk.HttpClient;
+import org.stellar.sdk.http.HttpClient;
 import org.stellar.sdk.KeyPair;
 import org.stellar.sdk.ResponseHandler;
 import org.stellar.sdk.responses.AccountResponse;

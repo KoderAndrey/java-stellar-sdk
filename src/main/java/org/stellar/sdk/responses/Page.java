@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 
 import okhttp3.HttpUrl;
-import org.stellar.sdk.HttpClient;
+import org.stellar.sdk.http.HttpClient;
 import org.stellar.sdk.ResponseHandler;
 import org.stellar.sdk.requests.ResponseHandlerClass;
 

@@ -4,6 +4,7 @@ import com.google.gson.reflect.TypeToken;
 
 import okhttp3.HttpUrl;
 import org.stellar.sdk.*;
+import org.stellar.sdk.http.HttpClient;
 import org.stellar.sdk.responses.Page;
 import org.stellar.sdk.responses.PathResponse;
 

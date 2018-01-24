@@ -3,7 +3,7 @@ package org.stellar.sdk.requests;
 import com.google.gson.reflect.TypeToken;
 
 import okhttp3.HttpUrl;
-import org.stellar.sdk.HttpClient;
+import org.stellar.sdk.http.HttpClient;
 import org.stellar.sdk.KeyPair;
 import org.stellar.sdk.ResponseHandler;
 import org.stellar.sdk.responses.OfferResponse;

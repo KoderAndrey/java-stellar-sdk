@@ -4,8 +4,8 @@ import com.google.gson.reflect.TypeToken;
 
 import okhttp3.ResponseBody;
 import org.stellar.sdk.ResponseHandler;
-import org.stellar.sdk.http.client.ClientProtocolException;
-import org.stellar.sdk.http.client.HttpResponseException;
+import org.stellar.sdk.http.ClientProtocolException;
+import org.stellar.sdk.http.HttpResponseException;
 import org.stellar.sdk.responses.GsonSingleton;
 import org.stellar.sdk.responses.Response;
 

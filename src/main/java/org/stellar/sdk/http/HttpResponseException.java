@@ -1,4 +1,6 @@
-package org.stellar.sdk.http.client;
+package org.stellar.sdk.http;
+
+import org.stellar.sdk.http.ClientProtocolException;
 
 public class HttpResponseException extends ClientProtocolException {
 

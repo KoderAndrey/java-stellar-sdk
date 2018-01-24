@@ -8,9 +8,9 @@ import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
-import org.stellar.sdk.HttpClient;
+import org.stellar.sdk.http.HttpClient;
 import org.stellar.sdk.ResponseHandler;
-import org.stellar.sdk.http.client.HttpResponseException;
+import org.stellar.sdk.http.HttpResponseException;
 import org.stellar.sdk.requests.ResponseHandlerClass;
 
 import java.io.IOException;

@@ -1,4 +1,4 @@
-package org.stellar.sdk.http.client;
+package org.stellar.sdk.http;
 
 import java.io.IOException;
 
