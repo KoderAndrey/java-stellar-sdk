@@ -4,22 +4,17 @@ import com.google.common.net.InternetDomainName;
 import com.google.gson.reflect.TypeToken;
 import com.moandjiezana.toml.Toml;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.HttpResponseException;
-import org.apache.http.client.fluent.Executor;
-import org.apache.http.client.fluent.Request;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.impl.client.HttpClients;
-import org.stellar.sdk.requests.ResponseHandler;
+import okhttp3.HttpUrl;
+import okhttp3.OkHttpClient;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
+import org.stellar.sdk.HttpClient;
+import org.stellar.sdk.ResponseHandler;
+import org.stellar.sdk.http.client.HttpResponseException;
+import org.stellar.sdk.requests.ResponseHandlerClass;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
 import java.net.URI;
-import java.net.URISyntaxException;
 
 /**
  * FederationServer handles a network connection to a
@@ -32,9 +27,9 @@ import java.net.URISyntaxException;
  * @see <a href="https://www.stellar.org/developers/learn/concepts/federation.html" target="_blank">Federation docs</a>
  */
 public class FederationServer {
-  private final URI serverUri;
+  private final HttpUrl serverUrl;
   private final InternetDomainName domain;
-  private static HttpClient httpClient = HttpClients.createDefault();
+  private static OkHttpClient httpClient = HttpClient.instance();
 
   /**
    * Creates a new <code>FederationServer</code> instance.
@@ -43,10 +38,10 @@ public class FederationServer {
    * @throws FederationServerInvalidException Federation server is invalid (malformed URL, not HTTPS, etc.)
    */
   public FederationServer(URI serverUri, InternetDomainName domain) {
-    this.serverUri = serverUri;
-    if (this.serverUri.getScheme() != "https") {
+    if (serverUri.getScheme() != "https") {
       throw new FederationServerInvalidException();
     }
+    serverUrl = HttpUrl.get(serverUri);
     this.domain = domain;
   }
 
@@ -57,9 +52,8 @@ public class FederationServer {
    * @throws FederationServerInvalidException Federation server is invalid (malformed URL, not HTTPS, etc.)
    */
   public FederationServer(String serverUri, InternetDomainName domain) {
-    try {
-      this.serverUri = new URI(serverUri);
-    } catch (URISyntaxException e) {
+    serverUrl = HttpUrl.parse(serverUri);
+    if (serverUrl == null || !serverUrl.scheme().equals("https") ) {
       throw new FederationServerInvalidException();
     }
     this.domain = domain;
@@ -77,36 +71,33 @@ public class FederationServer {
    * @return FederationServer
    */
   public static FederationServer createForDomain(InternetDomainName domain) {
-    Executor executor = Executor.newInstance(FederationServer.httpClient);
-    URI stellarTomlUri;
-    try {
-      StringBuilder uriBuilder = new StringBuilder();
-      uriBuilder.append("https://");
-      uriBuilder.append(domain.toString());
-      uriBuilder.append("/.well-known/stellar.toml");
-      stellarTomlUri = new URI(uriBuilder.toString());
-    } catch (URISyntaxException e) {
-      throw new RuntimeException(e);
+    HttpUrl stellarTomlUrl;
+    StringBuilder uriBuilder = new StringBuilder();
+    uriBuilder.append("https://");
+    uriBuilder.append(domain.toString());
+    uriBuilder.append("/.well-known/stellar.toml");
+    stellarTomlUrl = HttpUrl.parse(uriBuilder.toString());
+    if (stellarTomlUrl == null) {
+      throw new RuntimeException("Unexpected error when building URL"
+                                 + " to get stellar.toml file");
     }
     Toml stellarToml = null;
     try {
-      stellarToml = executor.execute(Request.Get(stellarTomlUri))
-              .handleResponse(new org.apache.http.client.ResponseHandler<Toml>() {
+      stellarToml = HttpClient.executeGetAndHandleResponse(
+              stellarTomlUrl,
+              new ResponseHandler<Toml>() {
                 @Override
-                public Toml handleResponse(HttpResponse response) throws IOException {
-                  if (response.getStatusLine().getStatusCode() >= 300) {
+                public Toml handleResponse(Response response) throws IOException {
+                  if (response.code() >= 300) {
                     throw new StellarTomlNotFoundInvalidException();
                   }
 
-                  HttpEntity entity = response.getEntity();
-                  if (entity == null) {
+                  ResponseBody body = response.body();
+                  if (body == null) {
                     throw new StellarTomlNotFoundInvalidException();
                   }
 
-                  StringWriter writer = new StringWriter();
-                  InputStream content = entity.getContent();
-                  IOUtils.copy(content, writer);
-                  return new Toml().read(writer.toString());
+                  return new Toml().read(body.string());
                 }
               });
     } catch (IOException e) {
@@ -136,22 +127,16 @@ public class FederationServer {
       throw new MalformedAddressException();
     }
 
-    URIBuilder uriBuilder = new URIBuilder(this.serverUri);
-    uriBuilder.setParameter("type", "name");
-    uriBuilder.setParameter("q", address);
-    URI uri;
-    try {
-      uri = uriBuilder.build();
-    } catch (URISyntaxException e) {
-      throw new RuntimeException(e);
-    }
+    HttpUrl url = serverUrl.newBuilder().setQueryParameter("type", "name")
+                                        .setQueryParameter("q", address)
+                                        .build();
 
     TypeToken type = new TypeToken<FederationResponse>() {};
-    ResponseHandler<FederationResponse> responseHandler = new ResponseHandler<FederationResponse>(type);
-    Executor executor = Executor.newInstance(FederationServer.httpClient);
+    ResponseHandler<FederationResponse> responseHandler = new ResponseHandlerClass<FederationResponse>(type);
     try {
-      return (FederationResponse) executor.execute(Request.Get(uri)).handleResponse(responseHandler);
-    } catch (HttpResponseException e) {
+      return HttpClient.executeGetAndHandleResponse(url, responseHandler);
+    }
+    catch (HttpResponseException e) {
       if (e.getStatusCode() == 404) {
         throw new NotFoundException();
       } else {
@@ -166,8 +151,8 @@ public class FederationServer {
    * Returns a federation server URI.
    * @return URI
    */
-  public URI getServerUri() {
-    return serverUri;
+  public HttpUrl getServerUrl() {
+    return serverUrl;
   }
 
   /**
@@ -182,7 +167,7 @@ public class FederationServer {
    * To support mocking a client
    * @param httpClient
    */
-  static void setHttpClient(HttpClient httpClient) {
+  static void setHttpClient(OkHttpClient httpClient) {
     FederationServer.httpClient = httpClient;
   }
 }
