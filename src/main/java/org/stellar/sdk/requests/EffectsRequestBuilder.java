@@ -8,6 +8,7 @@ import org.glassfish.jersey.media.sse.InboundEvent;
 import org.glassfish.jersey.media.sse.SseFeature;
 import org.stellar.sdk.HttpClient;
 import org.stellar.sdk.KeyPair;
+import org.stellar.sdk.ResponseHandler;
 import org.stellar.sdk.responses.GsonSingleton;
 import org.stellar.sdk.responses.Page;
 import org.stellar.sdk.responses.effects.EffectResponse;
@@ -79,7 +80,7 @@ public class EffectsRequestBuilder extends RequestBuilder {
    */
   public static Page<EffectResponse> execute(HttpUrl url) throws IOException, TooManyRequestsException {
     TypeToken type = new TypeToken<Page<EffectResponse>>() {};
-    ResponseHandler<Page<EffectResponse>> responseHandler = new ResponseHandler<Page<EffectResponse>>(type);
+    ResponseHandler<Page<EffectResponse>> responseHandler = new ResponseHandlerClass<Page<EffectResponse>>(type);
     return HttpClient.executeGetAndHandleResponse(url, responseHandler);
   }
 

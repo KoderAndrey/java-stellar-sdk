@@ -7,6 +7,7 @@ import org.glassfish.jersey.media.sse.EventSource;
 import org.glassfish.jersey.media.sse.InboundEvent;
 import org.glassfish.jersey.media.sse.SseFeature;
 import org.stellar.sdk.HttpClient;
+import org.stellar.sdk.ResponseHandler;
 import org.stellar.sdk.responses.GsonSingleton;
 import org.stellar.sdk.responses.LedgerResponse;
 import org.stellar.sdk.responses.Page;
@@ -32,7 +33,7 @@ public class LedgersRequestBuilder extends RequestBuilder {
    */
   public LedgerResponse ledger(HttpUrl url) throws IOException {
     TypeToken type = new TypeToken<LedgerResponse>() {};
-    ResponseHandler<LedgerResponse> responseHandler = new ResponseHandler<LedgerResponse>(type);
+    ResponseHandler<LedgerResponse> responseHandler = new ResponseHandlerClass<LedgerResponse>(type);
     return HttpClient.executeGetAndHandleResponse(url, responseHandler);
   }
 
@@ -56,7 +57,7 @@ public class LedgersRequestBuilder extends RequestBuilder {
    */
   public static Page<LedgerResponse> execute(HttpUrl url) throws IOException, TooManyRequestsException {
     TypeToken type = new TypeToken<Page<LedgerResponse>>() {};
-    ResponseHandler<Page<LedgerResponse>> responseHandler = new ResponseHandler<Page<LedgerResponse>>(type);
+    ResponseHandler<Page<LedgerResponse>> responseHandler = new ResponseHandlerClass<Page<LedgerResponse>>(type);
     return HttpClient.executeGetAndHandleResponse(url, responseHandler);
   }
 

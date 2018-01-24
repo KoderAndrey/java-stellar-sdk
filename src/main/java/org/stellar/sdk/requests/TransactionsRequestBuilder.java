@@ -8,6 +8,7 @@ import org.glassfish.jersey.media.sse.InboundEvent;
 import org.glassfish.jersey.media.sse.SseFeature;
 import org.stellar.sdk.HttpClient;
 import org.stellar.sdk.KeyPair;
+import org.stellar.sdk.ResponseHandler;
 import org.stellar.sdk.responses.GsonSingleton;
 import org.stellar.sdk.responses.Page;
 import org.stellar.sdk.responses.TransactionResponse;
@@ -35,7 +36,7 @@ public class TransactionsRequestBuilder extends RequestBuilder {
    */
   public TransactionResponse transaction(HttpUrl url) throws IOException {
     TypeToken type = new TypeToken<TransactionResponse>() {};
-    ResponseHandler<TransactionResponse> responseHandler = new ResponseHandler<TransactionResponse>(type);
+    ResponseHandler<TransactionResponse> responseHandler = new ResponseHandlerClass<TransactionResponse>(type);
     return HttpClient.executeGetAndHandleResponse(url, responseHandler);
   }
 
@@ -80,7 +81,7 @@ public class TransactionsRequestBuilder extends RequestBuilder {
    */
   public static Page<TransactionResponse> execute(HttpUrl url) throws IOException, TooManyRequestsException {
     TypeToken type = new TypeToken<Page<TransactionResponse>>() {};
-    ResponseHandler<Page<TransactionResponse>> responseHandler = new ResponseHandler<Page<TransactionResponse>>(type);
+    ResponseHandler<Page<TransactionResponse>> responseHandler = new ResponseHandlerClass<Page<TransactionResponse>>(type);
     return HttpClient.executeGetAndHandleResponse(url, responseHandler);
   }
 

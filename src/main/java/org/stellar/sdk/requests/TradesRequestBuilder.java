@@ -5,6 +5,7 @@ import okhttp3.HttpUrl;
 import org.stellar.sdk.Asset;
 import org.stellar.sdk.AssetTypeCreditAlphaNum;
 import org.stellar.sdk.HttpClient;
+import org.stellar.sdk.ResponseHandler;
 import org.stellar.sdk.responses.TradeResponse;
 
 import java.io.IOException;
@@ -39,7 +40,7 @@ public class TradesRequestBuilder extends RequestBuilder {
 
     public static TradeResponse execute(HttpUrl url) throws IOException, TooManyRequestsException {
         TypeToken type = new TypeToken<TradeResponse>() {};
-        ResponseHandler<TradeResponse> responseHandler = new ResponseHandler<TradeResponse>(type);
+        ResponseHandler<TradeResponse> responseHandler = new ResponseHandlerClass<TradeResponse>(type);
         return HttpClient.executeGetAndHandleResponse(url, responseHandler);
     }
 

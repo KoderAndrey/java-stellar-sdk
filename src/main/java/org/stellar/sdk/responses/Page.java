@@ -5,7 +5,8 @@ import com.google.gson.reflect.TypeToken;
 
 import okhttp3.HttpUrl;
 import org.stellar.sdk.HttpClient;
-import org.stellar.sdk.requests.ResponseHandler;
+import org.stellar.sdk.ResponseHandler;
+import org.stellar.sdk.requests.ResponseHandlerClass;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -41,7 +42,7 @@ public class Page<T> extends Response {
       return null;
     }
     TypeToken type = new TypeToken<Page<T>>() {};
-    ResponseHandler<Page<T>> responseHandler = new ResponseHandler<Page<T>>(type);
+    ResponseHandler<Page<T>> responseHandler = new ResponseHandlerClass<Page<T>>(type);
     HttpUrl url = HttpUrl.parse(this.getLinks().getNext().getHref());
     return HttpClient.executeGetAndHandleResponse(url, responseHandler);
   }

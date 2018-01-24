@@ -5,6 +5,7 @@ import com.google.gson.reflect.TypeToken;
 import okhttp3.HttpUrl;
 import org.stellar.sdk.HttpClient;
 import org.stellar.sdk.KeyPair;
+import org.stellar.sdk.ResponseHandler;
 import org.stellar.sdk.responses.OfferResponse;
 import org.stellar.sdk.responses.Page;
 
@@ -40,7 +41,7 @@ public class OffersRequestBuilder extends RequestBuilder {
    */
   public static Page<OfferResponse> execute(HttpUrl url) throws IOException, TooManyRequestsException {
     TypeToken type = new TypeToken<Page<OfferResponse>>() {};
-    ResponseHandler<Page<OfferResponse>> responseHandler = new ResponseHandler<Page<OfferResponse>>(type);
+    ResponseHandler<Page<OfferResponse>> responseHandler = new ResponseHandlerClass<Page<OfferResponse>>(type);
     return HttpClient.executeGetAndHandleResponse(url, responseHandler);
   }
 

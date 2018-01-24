@@ -5,6 +5,7 @@ import okhttp3.HttpUrl;
 import org.stellar.sdk.Asset;
 import org.stellar.sdk.AssetTypeCreditAlphaNum;
 import org.stellar.sdk.HttpClient;
+import org.stellar.sdk.ResponseHandler;
 import org.stellar.sdk.responses.OrderBookResponse;
 
 import java.io.IOException;
@@ -39,7 +40,7 @@ public class OrderBookRequestBuilder extends RequestBuilder {
 
   public static OrderBookResponse execute(HttpUrl url) throws IOException, TooManyRequestsException {
     TypeToken type = new TypeToken<OrderBookResponse>() {};
-    ResponseHandler<OrderBookResponse> responseHandler = new ResponseHandler<OrderBookResponse>(type);
+    ResponseHandler<OrderBookResponse> responseHandler = new ResponseHandlerClass<OrderBookResponse>(type);
     return HttpClient.executeGetAndHandleResponse(url, responseHandler);
   }
 

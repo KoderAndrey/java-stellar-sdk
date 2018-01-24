@@ -3,10 +3,7 @@ package org.stellar.sdk.requests;
 import com.google.gson.reflect.TypeToken;
 
 import okhttp3.HttpUrl;
-import org.stellar.sdk.Asset;
-import org.stellar.sdk.AssetTypeCreditAlphaNum;
-import org.stellar.sdk.HttpClient;
-import org.stellar.sdk.KeyPair;
+import org.stellar.sdk.*;
 import org.stellar.sdk.responses.Page;
 import org.stellar.sdk.responses.PathResponse;
 
@@ -51,7 +48,7 @@ public class PathsRequestBuilder extends RequestBuilder {
    */
   public static Page<PathResponse> execute(HttpUrl url) throws IOException, TooManyRequestsException {
     TypeToken type = new TypeToken<Page<PathResponse>>() {};
-    ResponseHandler<Page<PathResponse>> responseHandler = new ResponseHandler<Page<PathResponse>>(type);
+    ResponseHandler<Page<PathResponse>> responseHandler = new ResponseHandlerClass<Page<PathResponse>>(type);
     return HttpClient.executeGetAndHandleResponse(url, responseHandler);
   }
 

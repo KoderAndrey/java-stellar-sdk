@@ -3,12 +3,13 @@ package org.stellar.sdk.requests;
 import com.google.gson.reflect.TypeToken;
 
 import okhttp3.ResponseBody;
+import org.stellar.sdk.ResponseHandler;
 import org.stellar.sdk.responses.GsonSingleton;
 import org.stellar.sdk.responses.Response;
 
 import java.io.IOException;
 
-public class ResponseHandler<T>  {
+public class ResponseHandlerClass<T> implements ResponseHandler<T> {
 
   private TypeToken<T> type;
 
@@ -19,7 +20,7 @@ public class ResponseHandler<T>  {
    * More info: http://stackoverflow.com/a/14506181
    * @param type
    */
-  public ResponseHandler(TypeToken<T> type) {
+  public ResponseHandlerClass(TypeToken<T> type) {
     this.type = type;
   }
 
