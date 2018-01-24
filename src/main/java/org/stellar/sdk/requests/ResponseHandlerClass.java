@@ -4,6 +4,8 @@ import com.google.gson.reflect.TypeToken;
 
 import okhttp3.ResponseBody;
 import org.stellar.sdk.ResponseHandler;
+import org.stellar.sdk.http.client.ClientProtocolException;
+import org.stellar.sdk.http.client.HttpResponseException;
 import org.stellar.sdk.responses.GsonSingleton;
 import org.stellar.sdk.responses.Response;
 
@@ -35,12 +37,11 @@ public class ResponseHandlerClass<T> implements ResponseHandler<T> {
     }
     // Other errors
     if (statusCode >= 300) {
-      throw new IOException("HTTP status: "
-                            + statusCode + " " + response.message());
+      throw new HttpResponseException(statusCode, response.message());
     }
     // No content
     if (body == null) {
-      throw new IOException("Response contains no content");
+      throw new ClientProtocolException("Response contains no content");
     }
     String content = body.string();
 
