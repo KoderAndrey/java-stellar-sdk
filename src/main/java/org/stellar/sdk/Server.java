@@ -106,7 +106,7 @@ public class Server {
      */
     public SubmitTransactionResponse submitTransaction(Transaction transaction) throws IOException {
         HttpUrl transactionsUrl;
-        transactionsUrl = serverUrl.newBuilder().addPathSegment("/transactions").build();
+        transactionsUrl = serverUrl.newBuilder().addPathSegment("transactions").build();
         RequestBody formBody = new FormBody.Builder()
                 .add("tx", transaction.toEnvelopeXdrBase64())
                 .build();
